@@ -1,6 +1,5 @@
 package com.proyecto.Model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,21 +14,29 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "Material")
-@NoArgsConstructor
+@Table(name = "usuario")
 @AllArgsConstructor
-public class Material {
+@NoArgsConstructor
+public class Usuario {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_material")
 	private Integer id;
-	@Column(name = "nombre_material")
-	private String nombreMaterial;
-	@Column
-	private double precio;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_tipo_material", nullable = false)
-	private TipoMaterial tipoMaterial;
 
+	private String nombre;
+
+	private String apellido;
+
+	private String nombreUsuario;//nombre_usuario
+
+	private String contra;
+
+	private String telefono;
+	private String correo;
+
+	private boolean estado;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_rol", nullable = false)
+	private Rol rol;
 }

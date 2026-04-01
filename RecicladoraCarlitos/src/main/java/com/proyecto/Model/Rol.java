@@ -1,5 +1,6 @@
 package com.proyecto.Model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,15 +12,16 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "tipoMaterial")
-@NoArgsConstructor
+@Table(name = "rol")
 @AllArgsConstructor
-public class TipoMaterial {
+@NoArgsConstructor
+public class Rol {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name =  "id_rol")
 	private Integer id;
-
+	
+	@Column
 	private String descripcion;
-
 }

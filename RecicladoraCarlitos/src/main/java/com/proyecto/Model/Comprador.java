@@ -11,15 +11,20 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "tipoMaterial")
-@NoArgsConstructor
+@Table(name = "comprador")
 @AllArgsConstructor
-public class TipoMaterial {
+@NoArgsConstructor
+public class Comprador {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String descripcion;
+	private String RUC;
 
+	private String razonSocial;
+
+	private String telefono;
+
+	private String correo;
 }
