@@ -11,20 +11,14 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "recolector")
+@Table(name = "tipoDocumento")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Recolector {
+public class TipoDocumento {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String nombre;
-
-	private String apellido;
-
-	private String telefono;
-
-	private String dni;
+	private String descripcion;
 }

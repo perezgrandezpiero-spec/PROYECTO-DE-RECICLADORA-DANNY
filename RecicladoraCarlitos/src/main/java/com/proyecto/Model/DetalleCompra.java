@@ -2,34 +2,36 @@ package com.proyecto.Model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data // get y setter
-@Table(name = "Material")
-@NoArgsConstructor
+@Data
+@Table(name = "detalleCompra")
 @AllArgsConstructor
-public class Material {
+@NoArgsConstructor
+public class DetalleCompra {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_material")
 	private Integer id;
-	@Column(name = "nombre_material")
-	private String nombre;
+	@Column
+	private double peso;
 	@Column
 	private double precio;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_tipo_material", nullable = false)
-	private TipoMaterial tipoMaterial;
+	@Column
+	private double subtotal;
 
+	public double calcularSubtotal(double peso, double precio) {
+		return this.subtotal = peso * precio;
+	}
+
+	public boolean validarPeso(double peso) {
+		return false;
+	}
 }

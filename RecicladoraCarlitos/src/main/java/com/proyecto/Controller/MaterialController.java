@@ -14,19 +14,17 @@ public class MaterialController {
 
 	@Autowired
 	private MaterialService materialService;
-	
-	@GetMapping
+
+	@GetMapping("/error")
 	public String Material() {
 		return "error";
 	}
-	
-	@GetMapping("/listar")
-	public String error(Model model) {
-		
-		model.addAttribute("materiales",materialService.listarTodo());
-		return "listarMaterial";
+
+	@GetMapping
+	public String listar(Model model) {
+
+		model.addAttribute("materiales", materialService.listarTodo());
+		return "/material/lista.html";
 	}
-	
 
 }
-	

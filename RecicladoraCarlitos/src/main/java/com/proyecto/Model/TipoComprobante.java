@@ -1,5 +1,6 @@
 package com.proyecto.Model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,22 +10,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Data
-@Table(name = "comprador")
-@AllArgsConstructor
-@NoArgsConstructor
-public class Comprador {
+@Entity // ENTIDAD
+@Data // GETTERS Y SETTERS
+@Table(name = "TipoComprobante")
+@AllArgsConstructor // new Class(Arg1,Arg2,...,ArgN)
+@NoArgsConstructor // new Class()
+public class TipoComprobante {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String RUC;
-
-	private String razonSocial;
-
-	private String telefono;
-
-	private String correo;
+	@Column
+	private String descripcion;
 }

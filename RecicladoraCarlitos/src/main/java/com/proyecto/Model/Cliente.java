@@ -1,6 +1,6 @@
 package com.proyecto.Model;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,22 +14,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data // get y setter
-@Table(name = "Material")
-@NoArgsConstructor
+@Data
+@Table(name = "cliente")
 @AllArgsConstructor
-public class Material {
+@NoArgsConstructor
+public class Cliente { 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_material")
 	private Integer id;
-	@Column(name = "nombre_material")
-	private String nombre;
-	@Column
-	private double precio;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_tipo_material", nullable = false)
-	private TipoMaterial tipoMaterial;
 
+	private String RUC;
+
+	private String razonSocial;
+
+	private String telefono;
+
+	private String correo;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinColumn(name = "tipo_documento", nullable = false)
+	private TipoDocumento tipoDocumento;
 }

@@ -3,9 +3,31 @@
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
-<title>Listar Materiales</title>
+<title>Danny Humberto</title>
 </head>
 <body>
-
+	<table border="2">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Nombre</th>
+				<th>Precio</th>
+				<th>Tipo</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="m : ${materiales}">
+				<td th:text="${m.id}">Null</td>
+				<td th:text="${m.nombre}">Null</td>
+				<td th:text="${m.precio}">Null</td>
+				<td th:text="${m.tipoMaterial.descripcion}">Zzz</td>
+				<td>
+					<a href="">eliminar</a>
+					<a>Modificar</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </body>
 </html>
