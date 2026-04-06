@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recicladora Carlitos</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
+</head>
+
+<body>
+
+<nav th:fragment="sidebar" id="sidebar-wrapper">
+
+    <div class="sidebar-heading" sec:authorize="isAuthenticated()">
+        <div class="d-flex align-items-center gap-2">
+            <img th:src="@{'https://ui-avatars.com/api/?name=' + ${#authentication.name} + '&background=random'}"
+                 class="rounded-circle" width="40" height="40">
+            <div style="line-height: 1.2;">
+                <div class="fw-bold small" sec:authentication="name">Usuario</div>
+                <div class="text-muted" style="font-size: 0.70rem;" sec:authentication="principal.authorities">
+                    ROL</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-group list-group-flush" sec:authorize="isAuthenticated()">
+
+        <a th:href="@{/web/home}" class="sidebar-item list-group-item-action">
+            <i class="fa-solid fa-house"></i> Inicio
+        </a>
+
+        <div sec:authorize="hasAnyAuthority('ADMIN', 'GESTOR')">
+            <a class="sidebar-group-header" data-bs-toggle="collapse" href="#collapseGestion" role="button"
+               aria-expanded="true" aria-controls="collapseGestion">
+                GESTIÓN <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <div class="collapse show" id="collapseGestion">
+                <a th:href="@{/web/clientes}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-users"></i> Clientes
+                </a>
+                <a th:href="@{/web/ventas}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-cash-register"></i> Ventas
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAnyAuthority('ADMIN', 'GESTOR', 'OPERARIO')">
+            <a class="sidebar-group-header" data-bs-toggle="collapse" href="#collapseOperacion" role="button"
+               aria-expanded="true" aria-controls="collapseOperacion">
+                OPERACIÓN <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <div class="collapse show" id="collapseOperacion">
+                <a th:href="@{/web/proveedores}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-truck-field"></i> Proveedores
+                </a>
+                <a th:href="@{/web/compras}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-cart-arrow-down"></i> Compras
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAnyAuthority('ADMIN', 'GESTOR', 'OPERARIO')">
+            <a class="sidebar-group-header" data-bs-toggle="collapse" href="#collapseLogistica" role="button"
+               aria-expanded="true" aria-controls="collapseLogistica">
+                LOGÍSTICA <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <div class="collapse show" id="collapseLogistica">
+                <th:block sec:authorize="hasAnyAuthority('ADMIN', 'GESTOR')">
+                    <a th:href="@{/web/materiales}" class="sidebar-item list-group-item-action">
+                        <i class="fa-solid fa-boxes-stacked"></i> Materiales
+                    </a>
+                </th:block>
+
+                <a th:href="@{/web/transformaciones}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-gears"></i> Transformación
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAuthority('ADMIN')">
+            <a class="sidebar-group-header" data-bs-toggle="collapse" href="#collapseAdmin" role="button"
+               aria-expanded="true" aria-controls="collapseAdmin">
+                ADMINISTRACIÓN <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <div class="collapse show" id="collapseAdmin">
+                <a th:href="@{/web/categorias}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-tags"></i> Categorías
+                </a>
+                <a th:href="@{/web/trabajadores}" class="sidebar-item list-group-item-action">
+                    <i class="fa-solid fa-users-gear"></i> Trabajadores
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto p-3">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<nav th:fragment="topbar" class="navbar navbar-expand navbar-light top-navbar mb-4 static-top shadow">
+
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-primary" id="sidebarToggle">
+        <i class="fas fa-bars fa-lg"></i>
+    </button>
+
+    <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0 position-relative"
+          onsubmit="return false;">
+        <div class="input-group">
+            <input class="form-control search-input" id="searchInput" type="text" placeholder="Buscar módulos..."
+                   aria-label="Search" autocomplete="off" />
+            <button class="btn btn-primary" id="searchBtn" type="button"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="searchResults" class="list-group position-absolute w-100 shadow"
+             style="display:none; z-index: 1050; top: 100%; left: 0;"></div>
+    </form>
+
+    <div class="d-flex align-items-center ms-auto ms-md-0">
+        <span class="fw-bold fs-5 text-primary me-2">Recicladora Carlitos</span>
+        <img th:src="@{/img/favicon.png}" alt="Logo" width="32" height="32">
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="py-4 bg-light mt-auto">
+    <div class="container-fluid px-4">
+        <div class="d-flex align-items-center justify-content-between small">
+            <div class="text-muted">Copyright &copy; Recicladora Carlitos 2026</div>
+        </div>
+    </div>
+    <div th:replace="~{layout/layout :: scripts}"></div>
+</footer>
+
+<div th:fragment="scripts">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            const sidebarToggle = document.body.querySelector('#sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', event => {
+                    event.preventDefault();
+                    document.body.querySelector('#wrapper').classList.toggle('toggled');
+                });
+            }
+
+            // Lógica de búsqueda (se mantiene igual)
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            const sidebarLinks = Array.from(document.querySelectorAll('.sidebar-item')).map(link => {
+                return {
+                    text: link.textContent.trim(),
+                    keywords: link.textContent.trim().toLowerCase(),
+                    href: link.getAttribute('href')
+                };
+            });
+
+            const keywordMap = {
+                'productos': 'Materiales',
+                'residuos': 'Materiales',
+                'inventario': 'Materiales',
+                'stock': 'Materiales',
+                'produccion': 'Transformación',
+                'manufactura': 'Transformación',
+                'usuarios': 'Trabajadores',
+                'empleados': 'Trabajadores',
+                'personal': 'Trabajadores',
+                'gestor': 'Trabajadores',
+                'operario': 'Trabajadores',
+            };
+
+            sidebarLinks.forEach(item => {
+                for (const [key, val] of Object.entries(keywordMap)) {
+                    if (item.text.includes(val)) {
+                        item.keywords += ' ' + key;
+                    }
+                }
+            });
+
+            searchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase().trim();
+                searchResults.innerHTML = '';
+
+                if (query.length === 0) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                const filteredLinks = sidebarLinks.filter(link => link.keywords.includes(query));
+
+                if (filteredLinks.length > 0) {
+                    filteredLinks.forEach(link => {
+                        const item = document.createElement('a');
+                        item.classList.add('list-group-item', 'list-group-item-action');
+                        item.href = link.href;
+                        item.innerHTML = `<i class="fa-solid fa-share me-2 text-primary"></i> ${link.text}`;
+                        searchResults.appendChild(item);
+                    });
+                    searchResults.style.display = 'block';
+                } else {
+                    const noResult = document.createElement('div');
+                    noResult.classList.add('list-group-item', 'text-muted');
+                    noResult.innerText = 'No se encontraron resultados';
+                    searchResults.appendChild(noResult);
+                    searchResults.style.display = 'block';
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const firstResult = searchResults.querySelector('a');
+                    if (firstResult) {
+                        window.location.href = firstResult.href;
+                    }
+                }
+            });
+        });
+    </script>
+</div>
+
+</body>
+</html>

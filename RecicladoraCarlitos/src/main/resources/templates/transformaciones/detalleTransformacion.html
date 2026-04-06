@@ -1,0 +1,71 @@
+<div>
+    <div class="modal-body p-0">
+        
+        <div class="bg-light p-4 text-center border-bottom">
+            <h5 class="mb-1 text-secondary">REGISTRO DE PRODUCCIÓN</h5>
+            <h3 class="fw-bold text-dark mb-0" th:text="${t.codigo}">TR-000</h3>
+            <span class="badge bg-success mt-2">PROCESADO EXITOSAMENTE</span>
+        </div>
+
+        <div class="p-4">
+            
+            <div class="row text-center mb-4">
+                <div class="col-4 border-end">
+                    <small class="text-muted fw-bold d-block">FECHA</small>
+                    <span th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')}"></span>
+                </div>
+                <div class="col-4 border-end">
+                    <small class="text-muted fw-bold d-block">HORA</small>
+                    <span th:text="${#temporals.format(t.fecha, 'HH:mm')}"></span>
+                </div>
+                <div class="col-4">
+                    <small class="text-muted fw-bold d-block">RESPONSABLE</small>
+                    <span class="text-primary fw-bold" th:text="${t.trabajador?.username}">User</span>
+                </div>
+            </div>
+
+            <div class="row align-items-center">
+                
+                <div class="col-5 text-center">
+                    <div class="card border-primary bg-primary-subtle shadow-sm">
+                        <div class="card-body p-2">
+                            <small class="text-primary fw-bold">INPUT (CONSUMO)</small>
+                            <h4 class="fw-bold my-1 text-dark" th:text="${t.cantidadOrigen}">100</h4>
+                            <span class="badge bg-primary" th:text="${t.materialOrigen.unidad}">KG</span>
+                            <div class="mt-2 small text-dark fw-bold text-truncate" th:text="${t.materialOrigen.nombre}">Botellas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-2 text-center">
+                    <i class="fa-solid fa-arrow-right fa-2x text-secondary opacity-50"></i>
+                </div>
+
+                <div class="col-5 text-center">
+                    <div class="card border-success bg-success-subtle shadow-sm">
+                        <div class="card-body p-2">
+                            <small class="text-success fw-bold">OUTPUT (PRODUCCIÓN)</small>
+                            <h4 class="fw-bold my-1 text-dark" th:text="${t.cantidadDestino}">10</h4>
+                            <span class="badge bg-success">UNIDADES</span>
+                            <div class="mt-2 small text-dark fw-bold text-truncate" th:text="${t.materialDestino.nombre}">Bloques</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="alert alert-secondary mt-4 mb-0 small text-center">
+                <i class="fa-solid fa-info-circle"></i> Categoría del Proceso: 
+                <strong th:text="${t.materialOrigen.categoria.nombre}">PLÁSTICO</strong>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer bg-light d-print-none">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn text-white" style="background-color: #6f42c1; border-color: #6f42c1;" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Imprimir Comprobante
+        </button>
+    </div>
+</div>

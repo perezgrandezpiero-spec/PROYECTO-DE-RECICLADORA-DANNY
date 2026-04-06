@@ -1,0 +1,50 @@
+<form th:action="@{/web/clientes/guardar}" th:object="${cliente}" method="post">
+    
+    <input type="hidden" th:field="*{id}" /> 
+    
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Razón Social / Nombre</label>
+            <input type="text" class="form-control" th:field="*{razonSocial}" required placeholder="Ej: Bodega Pepito">
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">DNI / RUC</label>
+                <input type="text" class="form-control" th:field="*{rucDni}" required placeholder="Ingrese documento">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Teléfono</label>
+                <input type="text" class="form-control" th:field="*{telefono}" placeholder="999-999-999">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-control" th:field="*{direccion}" placeholder="Av. Principal 123">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" th:field="*{email}" placeholder="correo@ejemplo.com">
+        </div>
+
+        <div class="mb-3 form-check form-switch" th:if="${cliente.id != null}">
+            <input class="form-check-input" type="checkbox" role="switch" id="checkActivo" th:field="*{activo}">
+            <label class="form-check-label" for="checkActivo">
+                <span class="badge bg-success" th:if="${cliente.activo}">Usuario Activo</span>
+                <span class="badge bg-secondary" th:unless="${cliente.activo}">Usuario Inactivo</span>
+            </label>
+        </div>
+        
+        <input type="hidden" th:if="${cliente.id == null}" name="activo" value="true">
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" style="background-color: #6f42c1; border-color: #6f42c1;">
+            <i class="fa-solid fa-save"></i> Guardar
+        </button>
+    </div>
+
+</form>
