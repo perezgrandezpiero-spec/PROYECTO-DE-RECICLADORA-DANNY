@@ -1,4 +1,4 @@
-package com.proyecto.util;
+package com.proyecto.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,30 +14,24 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(request -> request
-				// 1. Recursos estáticos (Públicos)
-				.requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
+		http.authorizeHttpRequests(
+				request -> request.requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
 
-				// 2. Login (Público)
-				.requestMatchers("/login", "/public/**").permitAll()
+						.requestMatchers("/login", "/public/**").permitAll()
+						.requestMatchers("/web/categorias/**", "/web/trabajadores/**").hasAuthority("ADMIN")
 
-				// 3. REGLAS DE NEGOCIO (Aquí cerramos las puertas traseras) 🛡️
+						// GESTIÓN: ADMIN o GESTOR
+						.requestMatchers("/web/clientes/**", "/web/ventas/**").hasAnyAuthority("ADMIN", "GESTOR")
 
-				// ADMINISTRACIÓN: Solo ADMIN
-				.requestMatchers("/web/categorias/**", "/web/trabajadores/**").hasAuthority("ADMIN")
+						// LOGÍSTICA (Materiales): ADMIN o GESTOR
+						.requestMatchers("/web/materiales/**").hasAnyAuthority("ADMIN", "GESTOR")
 
-				// GESTIÓN: ADMIN o GESTOR
-				.requestMatchers("/web/clientes/**", "/web/ventas/**").hasAnyAuthority("ADMIN", "GESTOR")
+						// OPERACIÓN y TRANSFORMACIÓN: ADMIN, GESTOR u OPERARIO
+						.requestMatchers("/web/proveedores/**", "/web/compras/**", "/web/transformaciones/**")
+						.hasAnyAuthority("ADMIN", "GESTOR", "OPERARIO")
 
-				// LOGÍSTICA (Materiales): ADMIN o GESTOR
-				.requestMatchers("/web/materiales/**").hasAnyAuthority("ADMIN", "GESTOR")
-
-				// OPERACIÓN y TRANSFORMACIÓN: ADMIN, GESTOR u OPERARIO
-				.requestMatchers("/web/proveedores/**", "/web/compras/**", "/web/transformaciones/**")
-				.hasAnyAuthority("ADMIN", "GESTOR", "OPERARIO")
-
-				// 4. Todo lo demás requiere login (Home, Logout, etc.)
-				.anyRequest().authenticated())
+						// 4. Todo lo demás requiere login (Home, Logout, etc.)
+						.anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/web/home", true) // Asegura que vayan al
 																									// home
 						.permitAll());

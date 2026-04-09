@@ -1,6 +1,5 @@
 package com.proyecto.Model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,34 +13,28 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "detalleCompra")
+@Table(name = "detalle_venta")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DetalleCompra {
+public class DetalleVenta {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column
-	private double peso;
-	@Column
-	private double precio;
-	@Column
+
+	private double precioUnitario;
+
 	private double subtotal;
-	@Column
-	private Integer cantidad;
+	// No tiene venta
 	@ManyToOne
-	@JoinColumn(name = "compra_id")
-	private Compra compra;
+	@JoinColumn(name = "venta_id", nullable = false)
+	private Venta venta;
+
+	// No tiene material
 	@ManyToOne
 	@JoinColumn(name = "material_id", nullable = false)
 	private Material material;
 
-	public double calcularSubtotal(double peso, double precio) {
-		return this.subtotal = peso * precio;
-	}
-
-	public boolean validarPeso(double peso) {
-		return false;
-	}
+	// Falta cantidad
+	private double cantidad;
 }

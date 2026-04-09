@@ -8,184 +8,169 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.reciclaje.model.Venta;
-import com.reciclaje.model.DetalleVenta;
-import com.reciclaje.model.Material;
-import com.reciclaje.model.Trabajador;
-import com.reciclaje.service.ClienteService;
-import com.reciclaje.service.MaterialService;
-import com.reciclaje.service.TrabajadorService;
-import com.reciclaje.service.VentaService;
+import com.proyecto.Model.DetalleVenta;
+import com.proyecto.Model.Material;
+import com.proyecto.Model.Usuario;
+import com.proyecto.Model.Venta;
+import com.proyecto.Service.ClienteService;
+import com.proyecto.Service.MaterialService;
+import com.proyecto.Service.UsuarioService;
+import com.proyecto.Service.VentaService;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/web/ventas")
-@SessionAttributes("venta") 
+@SessionAttributes("venta")
 public class VentaController {
 
-    @Autowired
-    private VentaService ventaService;
+	@Autowired
+	private VentaService ventaService;
 
-    @Autowired
-    private ClienteService clienteService;
+	@Autowired
+	private ClienteService clienteService;
 
-    @Autowired
-    private MaterialService materialService;
+	@Autowired
+	private MaterialService materialService;
 
-    @Autowired
-    private TrabajadorService trabajadorService;
+	@Autowired
+	private UsuarioService trabajadorService;
 
-    
-    @GetMapping
-    public String listar(@RequestParam(required = false) Integer trabajadorId, Model model, SessionStatus status) {
-        
-        status.setComplete();
+	@GetMapping
+	public String listar(@RequestParam(required = false) Integer trabajadorId, Model model, SessionStatus status) {
 
-        List<Venta> lista;
-        if (trabajadorId != null) {
-            lista = ventaService.listarPorTrabajador(trabajadorId);
-            model.addAttribute("trabajadorSeleccionado", trabajadorId);
-        } else {
-            lista = ventaService.listarVentas();
-        }
+		status.setComplete();
 
-        model.addAttribute("ventas", lista);
-        model.addAttribute("trabajadores", trabajadorService.listarTodos());
-        return "ventas/listaVentas"; 
-    }
+		List<Venta> lista;
+		if (trabajadorId != null) {
+			lista = ventaService.listarPorTrabajador(trabajadorId);
+			model.addAttribute("trabajadorSeleccionado", trabajadorId);
+		} else {
+			lista = ventaService.listarVentas();
+		}
 
-   
-    @GetMapping("/nueva")
-    public String nueva(Model model) {
-        Venta venta = new Venta();
-        venta.setTotal(0.0);
-        venta.setDetalles(new ArrayList<>());
+		model.addAttribute("ventas", lista);
+		model.addAttribute("trabajadores", trabajadorService.listarTodos());
+		return "ventas/listaVentas";
+	}
 
-        model.addAttribute("venta", venta);
-        cargarListas(model);
-        return "ventas/formularioVenta"; 
-    }
+	@GetMapping("/nueva")
+	public String nueva(Model model) {
+		Venta venta = new Venta();
+		venta.setMontoTotal(0.0);
+		venta.setDetalles(new ArrayList<>());
 
-    
+		model.addAttribute("venta", venta);
+		cargarListas(model);
+		return "ventas/formularioVenta";
+	}
 
-    @PostMapping("/agregar-item")
-    public String agregarItem(@ModelAttribute Venta venta,
-           
-            @RequestParam(required = false) Integer materialId,
-            @RequestParam(required = false) Double cantidad,
-            @RequestParam(required = false) Double precio,
-            Model model) {
+	@PostMapping("/agregar-item")
+	public String agregarItem(@ModelAttribute Venta venta,
 
-       
-        if (materialId == null || cantidad == null || precio == null) {
-            model.addAttribute("error", "Error: Debe seleccionar un producto, cantidad y precio válidos.");
-            cargarListas(model); 
-            return "ventas/formularioVenta";
-        }
+			@RequestParam(required = false) Integer materialId, @RequestParam(required = false) Double cantidad,
+			@RequestParam(required = false) Double precio, Model model) {
 
-        Material producto = materialService.buscarPorId(materialId);
+		if (materialId == null || cantidad == null || precio == null) {
+			model.addAttribute("error", "Error: Debe seleccionar un producto, cantidad y precio válidos.");
+			cargarListas(model);
+			return "ventas/formularioVenta";
+		}
 
-        
-        if (producto.getStock() < cantidad) {
-            model.addAttribute("error", "Stock insuficiente. Disponible: " + producto.getStock());
-            cargarListas(model);
-            return "ventas/formularioVenta";
-        }
+		Material producto = materialService.buscarPorId(materialId).orElse(null);
 
-        
-        boolean existe = false;
-       
-        if (venta.getDetalles() == null) {
-            venta.setDetalles(new ArrayList<>());
-        }
+		if (producto.getStock() < cantidad) {
+			model.addAttribute("error", "Stock insuficiente. Disponible: " + producto.getStock());
+			cargarListas(model);
+			return "ventas/formularioVenta";
+		}
 
-        for (DetalleVenta det : venta.getDetalles()) {
-            if (det.getMaterial().getId().equals(materialId)) {
-                
-                if (producto.getStock() < (det.getCantidad() + cantidad)) {
-                    model.addAttribute("error", "Stock insuficiente para sumar esa cantidad adicional.");
-                    cargarListas(model);
-                    return "ventas/formularioVenta";
-                }
-                
-                det.setCantidad(det.getCantidad() + cantidad);
-                det.setPrecio(precio);
-                det.setSubtotal(det.getCantidad() * precio);
-                existe = true;
-                break;
-            }
-        }
+		boolean existe = false;
 
-        if (!existe) {
-            DetalleVenta detalle = new DetalleVenta();
-            detalle.setMaterial(producto);
-            detalle.setCantidad(cantidad);
-            detalle.setPrecio(precio);
-            detalle.setSubtotal(cantidad * precio);
-            venta.agregarDetalle(detalle);
-        }
+		if (venta.getDetalles() == null) {
+			venta.setDetalles(new ArrayList<>());
+		}
 
-       
-        double sumaTotal = venta.getDetalles().stream().mapToDouble(DetalleVenta::getSubtotal).sum();
-        venta.setTotal(sumaTotal);
+		for (DetalleVenta det : venta.getDetalles()) {
+			if (det.getMaterial().getId().equals(materialId)) {
 
-        cargarListas(model);
-        return "ventas/formularioVenta";
-    }
+				if (producto.getStock() < (det.getCantidad() + cantidad)) {
+					model.addAttribute("error", "Stock insuficiente para sumar esa cantidad adicional.");
+					cargarListas(model);
+					return "ventas/formularioVenta";
+				}
 
-    
-    @GetMapping("/eliminar-item/{index}")
-    public String eliminarItem(@ModelAttribute Venta venta, @PathVariable int index, Model model) {
-        if (index >= 0 && index < venta.getDetalles().size()) {
-            venta.getDetalles().remove(index);
+				det.setCantidad(det.getCantidad() + cantidad);
+				det.setPrecioUnitario(precio);
+				det.setSubtotal(det.getCantidad() * precio);
+				existe = true;
+				break;
+			}
+		}
 
-            
-            double sumaTotal = venta.getDetalles().stream().mapToDouble(DetalleVenta::getSubtotal).sum();
-            venta.setTotal(sumaTotal);
-        }
-        cargarListas(model);
-        return "ventas/formularioVenta";
-    }
+		if (!existe) {
+			DetalleVenta detalle = new DetalleVenta();
+			detalle.setMaterial(producto);
+			detalle.setCantidad(cantidad);
+			detalle.setPrecioUnitario(precio);
+			detalle.setSubtotal(cantidad * precio);
+			venta.agregarDetalle(detalle);
+		}
 
-   
-    @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Venta venta, HttpSession session, SessionStatus status, Model model) {
-        try {
-            Trabajador t = (Trabajador) session.getAttribute("usuarioLogueado");
-            if (t == null) {
-                return "redirect:/login";
-            }
-            venta.setTrabajador(t);
+		double sumaTotal = venta.getDetalles().stream().mapToDouble(DetalleVenta::getSubtotal).sum();
+		venta.setMontoTotal(sumaTotal);
 
-            ventaService.guardarVenta(venta);
+		cargarListas(model);
+		return "ventas/formularioVenta";
+	}
 
-            status.setComplete(); 
-            return "redirect:/web/ventas";
+	@GetMapping("/eliminar-item/{index}")
+	public String eliminarItem(@ModelAttribute Venta venta, @PathVariable int index, Model model) {
+		if (index >= 0 && index < venta.getDetalles().size()) {
+			venta.getDetalles().remove(index);
 
-        } catch (RuntimeException e) {
-           
-            model.addAttribute("error", e.getMessage());
-            cargarListas(model);
-            return "ventas/formularioVenta";
-        }
-    }
+			double sumaTotal = venta.getDetalles().stream().mapToDouble(DetalleVenta::getSubtotal).sum();
+			venta.setMontoTotal(sumaTotal);
+		}
+		cargarListas(model);
+		return "ventas/formularioVenta";
+	}
 
-  
-    @GetMapping("/ver/{id}")
-    public String verDetalle(@PathVariable Integer id, Model model) {
-        Venta venta = ventaService.buscarPorId(id);
-        if (venta == null) {
-            return "redirect:/web/ventas";
-        }
-        model.addAttribute("venta", venta);
-        return "ventas/detalleVenta";
-    }
+	@PostMapping("/guardar")
+	public String guardar(@ModelAttribute Venta venta, HttpSession session, SessionStatus status, Model model) {
+		try {
+			Usuario t = (Usuario) session.getAttribute("usuarioLogueado");
+			if (t == null) {
+				return "redirect:/login";
+			}
+			venta.setTrabajador(t);
 
-    
-    private void cargarListas(Model model) {
-        model.addAttribute("clientes", clienteService.listarActivos());
-       
-        model.addAttribute("productos", materialService.listarActivosPorTipo("PRODUCTO"));
-    }
+			ventaService.guardarVenta(venta);
+
+			status.setComplete();
+			return "redirect:/web/ventas";
+
+		} catch (RuntimeException e) {
+
+			model.addAttribute("error", e.getMessage());
+			cargarListas(model);
+			return "ventas/formularioVenta";
+		}
+	}
+
+	@GetMapping("/ver/{id}")
+	public String verDetalle(@PathVariable Integer id, Model model) {
+		Venta venta = ventaService.buscarPorId(id);
+		if (venta == null) {
+			return "redirect:/web/ventas";
+		}
+		model.addAttribute("venta", venta);
+		return "ventas/detalleVenta";
+	}
+
+	private void cargarListas(Model model) {
+		model.addAttribute("clientes", clienteService.listarActivos());
+
+		model.addAttribute("productos", materialService.listarActivosPorTipo("PRODUCTO"));
+	}
 }

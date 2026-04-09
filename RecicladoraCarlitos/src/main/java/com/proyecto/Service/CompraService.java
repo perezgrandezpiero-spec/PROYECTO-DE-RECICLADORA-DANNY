@@ -7,67 +7,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.reciclaje.dto.IComprasPorMes;
-import com.reciclaje.model.Compra;
-import com.reciclaje.model.DetalleCompra;
-import com.reciclaje.model.Material;
-import com.reciclaje.repository.CompraRepository;
-import com.reciclaje.repository.MaterialRepository;
+import com.proyecto.DTO.IComprasPorMes;
+import com.proyecto.Model.Compra;
+import com.proyecto.Model.DetalleCompra;
+import com.proyecto.Model.Material;
+import com.proyecto.Repository.CompraRepository;
+import com.proyecto.Repository.MaterialRepository;
 
 @Service
 public class CompraService {
 
-    @Autowired
-    private CompraRepository compraRepository;
+	@Autowired
+	private CompraRepository compraRepository;
 
-    @Autowired
-    private MaterialRepository materialRepository;
+	@Autowired
+	private MaterialRepository materialRepository;
 
-    public List<Compra> listarCompras() {
-        return compraRepository.findAllByOrderByFechaDesc();
-    }
+	public List<Compra> listarCompras() {
+		return compraRepository.findAllByOrderByFechaDesc();
+	}
 
-    public List<Compra> listarPorTrabajador(Integer trabajadorId) {
-        return compraRepository.findByTrabajadorIdOrderByFechaDesc(trabajadorId);
-    }
+	public List<Compra> listarPorTrabajador(Integer UserId) {
+		return compraRepository.findByUsuarioIdOrderByFechaDesc(UserId);
+	}
 
-    public Compra buscarPorId(Integer id) {
-        return compraRepository.findById(id).orElse(null);
-    }
+	public Compra buscarPorId(Integer id) {
+		return compraRepository.findById(id).orElse(null);
+	}
 
-   
+	public Double obtenerTotalCompras() {
+		return compraRepository.sumarComprasTotales();
+	}
 
-    public Double obtenerTotalCompras() {
-        return compraRepository.sumarComprasTotales();
-    }
+	@Transactional
+	public Compra guardarCompra(Compra compra) {
 
-   
-    @Transactional
-    public Compra guardarCompra(Compra compra) {
+		if (compra.getFecha() == null) {
+			compra.setFecha(LocalDateTime.now());
+		}
 
-        if (compra.getFecha() == null) {
-            compra.setFecha(LocalDateTime.now());
-        }
+		if (compra.getCodigo() == null) {
+			compra.setCodigo("CP-" + System.currentTimeMillis());
+		}
 
-        if (compra.getCodigo() == null) {
-            compra.setCodigo("CP-" + System.currentTimeMillis());
-        }
+		for (DetalleCompra detalle : compra.getDetalles()) {
 
-        for (DetalleCompra detalle : compra.getDetalles()) {
+			Material material = materialRepository.findById(detalle.getMaterial().getId())
+					.orElseThrow(() -> new RuntimeException("Material no encontrado"));
 
-            Material material = materialRepository.findById(detalle.getMaterial().getId())
-                    .orElseThrow(() -> new RuntimeException("Material no encontrado"));
+			Double nuevoStock = material.getStock() + detalle.getCantidad();
+			material.setStock(nuevoStock);
 
-            Double nuevoStock = material.getStock() + detalle.getCantidad();
-            material.setStock(nuevoStock);
+			materialRepository.save(material);
+		}
+		return compraRepository.save(compra);
+	}
 
-            materialRepository.save(material);
-        }
-        return compraRepository.save(compra);
-    }
-
-    public List<IComprasPorMes> obtenerReporteMensual() {
-        return compraRepository.obtenerComprasPorMes();
-    }
+	public List<IComprasPorMes> obtenerReporteMensual() {
+		return compraRepository.obtenerComprasPorMes();
+	}
 
 }

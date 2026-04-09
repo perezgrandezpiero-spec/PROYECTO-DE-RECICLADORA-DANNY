@@ -7,14 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.proyecto.Service.CategoriaService;
+import com.proyecto.Model.TipoMaterial;
+import com.proyecto.Service.TipoMaterialService;
 
 @Controller
 @RequestMapping("/web/categorias")
-public class CategoriaController {
+public class TipoMaterialController {
 
 	@Autowired
-	private CategoriaService categoriaService;
+	private TipoMaterialService categoriaService;
 
 	@GetMapping
 	public String listar(@RequestParam(required = false) Boolean mostrarTodos, Model model) {
@@ -32,19 +33,19 @@ public class CategoriaController {
 
 	@GetMapping("/nueva")
 	public String nueva(Model model) {
-		model.addAttribute("categoria", new Categoria());
+		model.addAttribute("categoria", new TipoMaterial());
 		return "categorias/formularioCategorias";
 	}
 
 	@PostMapping("/guardar")
-	public String guardar(@ModelAttribute Categoria categoria) {
+	public String guardar(@ModelAttribute TipoMaterial categoria) {
 		categoriaService.guardar(categoria);
 		return "redirect:/web/categorias";
 	}
 
 	@GetMapping("/{id}/editar")
 	public String editar(@PathVariable Integer id, Model model) {
-		Optional<Categoria> opcionCategoria = Optional.ofNullable(categoriaService.buscarPorId(id));
+		Optional<TipoMaterial> opcionCategoria = Optional.ofNullable(categoriaService.buscarPorId(id));
 		if (opcionCategoria.isPresent()) {
 			model.addAttribute("categoria", opcionCategoria.get());
 			return "categorias/formularioCategorias";

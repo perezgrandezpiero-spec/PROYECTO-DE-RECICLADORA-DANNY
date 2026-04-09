@@ -20,8 +20,36 @@ public class MaterialService {
 		return materialRepository.findAll();
 	}
 
-	public Optional<Material> listarPorId(@RequestParam Integer id) {
+	public Optional<Material> buscarPorId(@RequestParam Integer id) {
 		return materialRepository.findById(id);
+	}
+
+	public List<Material> listarActivosPorTipo(@RequestParam String nombre) {
+		return materialRepository.findByTipoMaterialNombre(nombre);
+	}
+
+	public List<Material> listarResiduos() {
+		return materialRepository.findByTipoMaterialNombre("RESIDUO");
+	}
+
+	public List<Material> listarProductos() {
+		return materialRepository.findByTipoMaterialNombre("PRODUCTO");
+	}
+
+	public int contarProductos() {
+		return materialRepository.countByTipoMaterialNombre("PRODUCTO");
+	}
+
+	public int contarResiduos() {
+		return materialRepository.countByTipoMaterialNombre("RESIDUO");
+	}
+
+	public List<Material> buscarStockBajo(Double min) {
+		return materialRepository.findByStockLessThan(min);
+	}
+
+	public List<Material> listarActivos() {
+		return materialRepository.findByActivoTrue();
 	}
 
 }

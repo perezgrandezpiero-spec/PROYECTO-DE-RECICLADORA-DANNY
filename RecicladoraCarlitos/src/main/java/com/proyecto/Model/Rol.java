@@ -19,9 +19,9 @@ public class Rol {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name =  "id_rol")
+	@Column(name = "id_rol")
 	private Integer id;
-	
+
 	@Column
-	private String descripcion;
+	private String nombre;
 }

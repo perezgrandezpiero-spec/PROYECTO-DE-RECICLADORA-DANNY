@@ -24,12 +24,20 @@ public class Material {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_material")
 	private Integer id;
-	@Column(name = "nombre_material")
+	@Column
 	private String nombre;
+	@Column
+	private Double stock;
 	@Column
 	private double precio;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_tipo_material", nullable = false)
 	private TipoMaterial tipoMaterial;
+
+	private boolean activo = true;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_unidad_medida")
+	private UnidadMedida unidad;
 
 }

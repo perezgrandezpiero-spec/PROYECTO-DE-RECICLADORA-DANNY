@@ -27,16 +27,21 @@ public class Usuario {
 
 	private String apellido;
 
-	private String nombreUsuario;//nombre_usuario
+	private String nombreUsuario;// nombre_usuario
 
 	private String contra;
 
 	private String telefono;
 	private String correo;
 
-	private boolean estado;
+	private String nroDocumento;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_tipo_documento", nullable = false)
+	private TipoDocumento tipoDocumento;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	private boolean activo = true;
+
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_rol", nullable = false)
 	private Rol rol;
 }
