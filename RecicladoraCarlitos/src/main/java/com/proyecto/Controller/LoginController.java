@@ -4,10 +4,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +28,7 @@ import com.proyecto.Service.VentaService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/")
 public class LoginController {
 
 	@Autowired
@@ -37,10 +41,10 @@ public class LoginController {
 	private VentaService ventaService;
 	@Autowired
 	private CompraService compraService;
-	@Autowired
-	private UsuarioService usuarioService;
+	//@Autowired
+	//private UsuarioService usuarioService;
 
-	@GetMapping("/")
+	@GetMapping
 	public String index() {
 		return "redirect:/login";
 	}
@@ -49,20 +53,15 @@ public class LoginController {
 	public String login() {
 		return "login";
 	}
-
-	@PostMapping("/login")
-	public String procesarLogin(@RequestParam String username, @RequestParam String password, HttpSession session,
-			Model model) {
-		Usuario t = usuarioService.validarCredenciales(username, password);
-
-		if (t != null) {
-			session.setAttribute("usuarioLogueado", t);
-			return "redirect:/web/home";
-		} else {
-			model.addAttribute("error", "Credenciales incorrectas");
-			return "login";
-		}
-	}
+	/*
+	 @PostMapping("/login") public String procesarLogin(@RequestParam String
+	 username, @RequestParam String password, HttpSession session, Model model) {
+	 Usuario t = usuarioService.validarCredenciales(username, password);
+	
+	 if (t != null) { session.setAttribute("usuarioLogueado", t); return
+	 "redirect:/web/home"; } else { model.addAttribute("error",
+	 "Credenciales incorrectas"); return "login"; } }
+	 */
 
 	@GetMapping("/web/home")
 	public String home(Model model) {
@@ -126,7 +125,7 @@ public class LoginController {
 		model.addAttribute("graficoDataCompras", dataComprasList);
 
 		List<Material> materiales = materialService.listarActivos();
-		java.util.Map<String, Double> stockPorCategoria = new java.util.HashMap<>();
+		Map<String, Double> stockPorCategoria = new HashMap<>();
 
 		for (Material m : materiales) {
 			if (m.getTipoMaterial() != null && m.getStock() != null && m.getStock() > 0) {
@@ -155,9 +154,8 @@ public class LoginController {
 		return "home";
 	}
 
-	@GetMapping("/logout")
-	public String logout(HttpSession session) {
-		session.invalidate();
-		return "redirect:/login";
-	}
+	/*
+	 @GetMapping("/logout") public String logout(HttpSession session) {
+	 session.invalidate(); return "redirect:/login"; }
+	 */
 }

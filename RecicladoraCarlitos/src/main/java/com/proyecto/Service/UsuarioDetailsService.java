@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.proyecto.Model.Usuario;
@@ -24,9 +25,16 @@ public class UsuarioDetailsService implements UserDetailsService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-
+		System.out.println(">>> Buscando usuario: " + nombreUsuario);
 		Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario)
 				.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nombreUsuario));
+		System.out.println(">>> ENTRANDO A loadUserByUsername con: [" + nombreUsuario + "]");
+		System.out.println(">>> Usuario encontrado: " + usuario.getNombreUsuario());
+		System.out.println(">>> Contraseña en BD: " + usuario.getContra());
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		System.out.println(">>> ¿Coincide admin123? " + encoder.matches("admin123", usuario.getContra()));
+		System.out.println(">>> Activo: " + usuario.isActivo());
+		System.out.println(">>> Rol: " + usuario.getRol().getNombre());
 
 		if (!usuario.isActivo()) {
 			throw new UsernameNotFoundException("Usuario inactivo: " + nombreUsuario);

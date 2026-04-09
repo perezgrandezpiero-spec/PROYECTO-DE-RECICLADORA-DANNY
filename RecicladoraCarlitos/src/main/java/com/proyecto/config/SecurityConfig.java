@@ -13,30 +13,33 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(
-				request -> request.requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(request -> request
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
+                .requestMatchers("/login", "/public/**").permitAll()
+                .requestMatchers("/web/categorias/**", "/web/trabajadores/**").hasAuthority("ADMIN")
+                .requestMatchers("/web/clientes/**", "/web/ventas/**").hasAnyAuthority("ADMIN", "GESTOR")
+                .requestMatchers("/web/materiales/**").hasAnyAuthority("ADMIN", "GESTOR")
+                .requestMatchers("/web/proveedores/**", "/web/compras/**", "/web/transformaciones/**")
+                    .hasAnyAuthority("ADMIN", "GESTOR", "OPERARIO")
+                .anyRequest().authenticated())
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/web/home", true)
+                .failureUrl("/login?error=true")
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll())
+            .csrf(csrf -> csrf.disable());
 
-						.requestMatchers("/login", "/public/**").permitAll()
-						.requestMatchers("/web/categorias/**", "/web/trabajadores/**").hasAuthority("ADMIN")
-
-						// GESTIÓN: ADMIN o GESTOR
-						.requestMatchers("/web/clientes/**", "/web/ventas/**").hasAnyAuthority("ADMIN", "GESTOR")
-
-						// LOGÍSTICA (Materiales): ADMIN o GESTOR
-						.requestMatchers("/web/materiales/**").hasAnyAuthority("ADMIN", "GESTOR")
-
-						// OPERACIÓN y TRANSFORMACIÓN: ADMIN, GESTOR u OPERARIO
-						.requestMatchers("/web/proveedores/**", "/web/compras/**", "/web/transformaciones/**")
-						.hasAnyAuthority("ADMIN", "GESTOR", "OPERARIO")
-
-						// 4. Todo lo demás requiere login (Home, Logout, etc.)
-						.anyRequest().authenticated())
-				.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/web/home", true) // Asegura que vayan al
-																									// home
-						.permitAll());
-		return http.build();
-	}
+        return http.build();
+    }
 
 	// Importar: org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 	// Importar: org.springframework.security.crypto.password.PasswordEncoder;
